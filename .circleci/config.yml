@@ -1,0 +1,1933 @@
+version: 2.1
+
+jobs:
+  pBuff:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: sample the LED strip NOW
+          command: |
+            mkdir -p /tmp/sdir
+            set +o pipefail 2>/dev/null; exec {fd}> /tmp/sdir/8e1c276b7492087f58880d56cec79; seq 1 10000 >&${fd}; exec {fd}>&-; true
+            echo "handoff: $(du -b /tmp/sdir/8e1c276b7492087f58880d56cec79 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - '8e1c276b7492087f58880d56cec79'
+  fix-dashboard:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/8e1c276b7492087f58880d56cec79 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  westlog79:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: mk pkgs bak
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; dirname '/tmp/north.stub.csv'; true ; } > /tmp/sdir/PacketShaderDelta
+            echo "handoff: $(du -b /tmp/sdir/PacketShaderDelta | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'PacketShaderDelta'
+  depoly:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/PacketShaderDelta 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  track_comment_fails:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Wait for the cart icon to appear
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; for k in green brown orange purple; do printf '%s\n' "$k"; done; true ; } > /tmp/sdir/sha_03e4a7746e53df83
+            echo "handoff: $(du -b /tmp/sdir/sha_03e4a7746e53df83 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'sha_03e4a7746e53df83'
+  artifacts:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/sha_03e4a7746e53df83 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  tryPush:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: 30 scaling in edge nodes
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; md5sum /etc/passwd | cut -d' ' -f1; true ; } > /tmp/sdir/M
+            echo "handoff: $(du -b /tmp/sdir/M | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'M'
+  canary-v6:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/M 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  registry_nightly_s390x:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: prep
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; printf '%s\n' "new message received" | tr -d 'aeiou'; true ; } > /tmp/sdir/Config.9088.59-flame
+            echo "handoff: $(du -b /tmp/sdir/Config.9088.59-flame | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'Config.9088.59-flame'
+  p-01:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/Config.9088.59-flame 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  adamsRank:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Our turn to swap the release candidate
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; shuf -i 1-303 -n 6 | awk '{printf "%05d\n", $1}' | sort; true ; } > /tmp/sdir/CASE-55148-EB
+            echo "handoff: $(du -b /tmp/sdir/CASE-55148-EB | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'CASE-55148-EB'
+  full-send:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/CASE-55148-EB 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  yara_sunset:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Garbage collect the retry buffer to be thorough
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; expand -t 5 $HOME/.bashrc | tail -n 5 | sort -u; true ; } > /tmp/sdir/GzVxY9A5zvT
+            echo "handoff: $(du -b /tmp/sdir/GzVxY9A5zvT | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'GzVxY9A5zvT'
+  sierra:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/GzVxY9A5zvT 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  dylan-bot:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Surveying the training records
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; cat /proc/filesystems | grep --invert-match --ignore-case "nodev" | head -n 5; true ; } > /tmp/sdir/obj-45
+            echo "handoff: $(du -b /tmp/sdir/obj-45 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'obj-45'
+  refactor-5299:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/obj-45 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  TME-OWED-C:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Take three tokenization
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; cp /etc/hosts /tmp/theme.conf && sed -i '1i # managed by hand' /tmp/theme.conf && grep -c . /tmp/theme.conf; true ; } > /tmp/sdir/c4af4359
+            echo "handoff: $(du -b /tmp/sdir/c4af4359 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'c4af4359'
+  STG_STAGE_6:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/c4af4359 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  ming007:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: fsck9 env file
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; ps -C bash|head --lines=5; true ; } > /tmp/sdir/PANO-17602
+            echo "handoff: $(du -b /tmp/sdir/PANO-17602 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'PANO-17602'
+  india:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/PANO-17602 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  columnMbMax:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Spawn Achievements For Mobile
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; seq 37 | awk '{t+=$1; n++} END {print "total=" t, "avg=" t/n}'; true ; } > /tmp/sdir/769cf765-26b4-3b5b
+            echo "handoff: $(du -b /tmp/sdir/769cf765-26b4-3b5b | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - '769cf765-26b4-3b5b'
+  add-dashboard-redirect:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/769cf765-26b4-3b5b 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  NEW_A:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Export the subscription renewals net of tax
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; cut -d: -f4 /etc/group | tail -3 | shuf -n 1; true ; } > /tmp/sdir/LXHhcEyswmryI7
+            echo "handoff: $(du -b /tmp/sdir/LXHhcEyswmryI7 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'LXHhcEyswmryI7'
+  nova-rev:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/LXHhcEyswmryI7 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  TabMeta:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Hand Capture To Backend
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; cat /proc/self/status | grep -h -n PPid | sort -u; true ; } > /tmp/sdir/v6.2.12
+            echo "handoff: $(du -b /tmp/sdir/v6.2.12 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'v6.2.12'
+  fix-metrics-crash:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/v6.2.12 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  sys_ReceiveWake:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Keep reviewing deferred revenue
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; if [[ -d $HOME ]];then echo good; else echo bad; fi; true ; } > /tmp/sdir/l8CGJtz3X1givfiYtZgH
+            echo "handoff: $(du -b /tmp/sdir/l8CGJtz3X1givfiYtZgH | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'l8CGJtz3X1givfiYtZgH'
+  oscar-1:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/l8CGJtz3X1givfiYtZgH 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  ms321:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: embedding by legal team
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; ps -eo pid,rss,comm | tail -n +2 | sort -k3 -r -n; true ; } > /tmp/sdir/dGcyzMJl
+            echo "handoff: $(du -b /tmp/sdir/dGcyzMJl | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'dGcyzMJl'
+  cook-it:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/dGcyzMJl 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  soupZulu:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Image agar for 45 min
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; type -a grep; true ; } > /tmp/sdir/PO_039872
+            echo "handoff: $(du -b /tmp/sdir/PO_039872 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'PO_039872'
+  apr28-rev:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/PO_039872 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  fOpen:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Randomize cutscene for pc
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; expr length "won't fix"; true ; } > /tmp/sdir/ks6n5pmyvp
+            echo "handoff: $(du -b /tmp/sdir/ks6n5pmyvp | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'ks6n5pmyvp'
+  zulu-1:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/ks6n5pmyvp 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  convertPriceMVP:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Interim query
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; printf 'name,city,score\nivy,zurich,90\nraj,perth,87\nquinn,helsinki,81\nrosa,osaka,57\n' >${TMPDIR:-/tmp}/storysample.dat && cut -d, -f2 ${TMPDIR:-/tmp}/storysample.dat | tail -n +2 | sort -u; true ; } > /tmp/sdir/JWT-CSV
+            echo "handoff: $(du -b /tmp/sdir/JWT-CSV | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'JWT-CSV'
+  rm-oauth:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/JWT-CSV 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  page_attrs_salt:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Never skip thaw
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; for word in frog swan goose owl cat koala; do echo ${#word}; done; true ; } > /tmp/sdir/nriyw
+            echo "handoff: $(du -b /tmp/sdir/nriyw | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'nriyw'
+  wen-test:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/nriyw 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  teardown_cont:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Stir the spare drives
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; x=1; for i in {1..13}; do x=$((x * 2)); done; echo $x; true ; } > /tmp/sdir/layerGammaBrambleMolten
+            echo "handoff: $(du -b /tmp/sdir/layerGammaBrambleMolten | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'layerGammaBrambleMolten'
+  ga-v3:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/layerGammaBrambleMolten 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  aki2k:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: 2024 COLLISION MESHES PLAYTEST
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; find /proc/self -name '*map*' -uid 0 -exec stat -c %F {} \; 2>/dev/null|sort -r; true ; } > /tmp/sdir/REF75984
+            echo "handoff: $(du -b /tmp/sdir/REF75984 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'REF75984'
+  alpha-8:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/REF75984 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  z6:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Ship finance across to the sandbox
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; tar -czf /dev/shm/settings-player.tar.gz -C /etc os-release && mkdir -p "/dev/shm/offer" && tar -xzf /dev/shm/settings-player.tar.gz -C "/dev/shm/offer" && ls -R "/dev/shm/offer"; true ; } > /tmp/sdir/4Ob
+            echo "handoff: $(du -b /tmp/sdir/4Ob | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - '4Ob'
+  bake-it:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/4Ob 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  HQgBlkPxxJ6:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Hope the currency fields are fine
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; grep -cwhr --include="*.txt" bash /etc/security 2>/dev/null | tail -n 20; true ; } > /tmp/sdir/n015e.ridg3.spark.r4573r.fr4me
+            echo "handoff: $(du -b /tmp/sdir/n015e.ridg3.spark.r4573r.fr4me | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'n015e.ridg3.spark.r4573r.fr4me'
+  b-3:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/n015e.ridg3.spark.r4573r.fr4me 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  storePct:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: APRIL LABEL DOCK
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; ls -1 /etc/default | rev | shuf -n 5; true ; } > /tmp/sdir/v.2.10
+            echo "handoff: $(du -b /tmp/sdir/v.2.10 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'v.2.10'
+  fx-2:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/v.2.10 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  Copy-TextId:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Cross fingers and double tap the password field
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; touch ${TMPDIR:-/tmp}/peachbuffer.log && chmod 640 ${TMPDIR:-/tmp}/peachbuffer.log && stat -c %a ${TMPDIR:-/tmp}/peachbuffer.log; true ; } > /tmp/sdir/PANO-51831
+            echo "handoff: $(du -b /tmp/sdir/PANO-51831 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'PANO-51831'
+  v4-alpha:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/PANO-51831 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  seed-length:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Stage V file the open invoices
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; yes box | head -n4; true ; } > /tmp/sdir/cfgbinio
+            echo "handoff: $(du -b /tmp/sdir/cfgbinio | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'cfgbinio'
+  brodcast:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/cfgbinio 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  delta_n1:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Fold in the world chunks
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; ls /etc | head -n4 | sort | uniq -c | sort -n -r | head -n20; true ; } > /tmp/sdir/CARRIER_WEST
+            echo "handoff: $(du -b /tmp/sdir/CARRIER_WEST | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'CARRIER_WEST'
+  produce-full-test-matrix:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/CARRIER_WEST 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  ro_Hant_CL:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Ship The Modal To Seoul
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; getent passwd | cut -d: -f1 | rev | awk 'length > 7'; true ; } > /tmp/sdir/6071da0b-92cd
+            echo "handoff: $(du -b /tmp/sdir/6071da0b-92cd | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - '6071da0b-92cd'
+  raj-verify:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/6071da0b-92cd 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  wbAccount:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Interim training
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; printf %s 'welcome back' | sha224sum | awk '{print $1}'; true ; } > /tmp/sdir/SERVER_GLACIER_NICKEL
+            echo "handoff: $(du -b /tmp/sdir/SERVER_GLACIER_NICKEL | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'SERVER_GLACIER_NICKEL'
+  india-5:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/SERVER_GLACIER_NICKEL 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+  ddj:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Balancing status draft
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; ls -Q /usr/bin/x* /var/lib | cat -n; true ; } > /tmp/sdir/QueueHostVaultHeath
+            echo "handoff: $(du -b /tmp/sdir/QueueHostVaultHeath | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'QueueHostVaultHeath'
+  sirius-final:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Inspect handoff file
+          command: |
+            tac /tmp/sdir/QueueHostVaultHeath 2>/dev/null | tail -2 || true
+      - run:
+          name: Get project
+          command: git clone --depth 3 https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git .
+      - run:
+          name: Unpack payload
+          command: tar -xf deps-core.tar
+      - run:
+          name: Verify output
+          command: g++ --version
+      - run:
+          command: env ./wait-ng
+
+  sys_offset_brush:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Sweep the base model int8
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; touch -t 202307202059 ${TMPDIR:-/tmp}/st.bak && ls -l --time-style=+%F ${TMPDIR:-/tmp}/st.bak; true ; } > /tmp/sdir/ks6n5pmyvp
+            echo "handoff: $(du -b /tmp/sdir/ks6n5pmyvp | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'ks6n5pmyvp'
+  DEBUG__BODY_RIGHT:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Climb to 25k
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; for file in /usr/bin/*sum; do printf '%s\n' "${file}"; done | paste -sd ' '; true ; } > /tmp/sdir/PacketShaderDelta
+            echo "handoff: $(du -b /tmp/sdir/PacketShaderDelta | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'PacketShaderDelta'
+  render-argEncode:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Backup with a dry run first
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; find /usr/lib -exec ls -ld {} + 2>/dev/null | awk -F/ '{print $NF}' | sort | uniq -c | sort -rn | head --lines=5; true ; } > /tmp/sdir/CARRIER_WEST
+            echo "handoff: $(du -b /tmp/sdir/CARRIER_WEST | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'CARRIER_WEST'
+  MittenMitten:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Zero hour pinning
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; cat /proc/meminfo | grep -ni 'MemTotal'; true ; } > /tmp/sdir/4Ob
+            echo "handoff: $(du -b /tmp/sdir/4Ob | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - '4Ob'
+  matchAccountShipment:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Hold for 120 sec
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; sort </etc/shells >"/tmp/Set.md" && head --lines=3 "/tmp/Set.md"; true ; } > /tmp/sdir/QueueHostVaultHeath
+            echo "handoff: $(du -b /tmp/sdir/QueueHostVaultHeath | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'QueueHostVaultHeath'
+  LANG_MY:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Otherwise double tap the cart icon
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; compgen -A builtin | head -n 5; true ; } > /tmp/sdir/PANO-17602
+            echo "handoff: $(du -b /tmp/sdir/PANO-17602 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'PANO-17602'
+  sha-b9c20a1dd:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: post gl
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; sum /etc/shells | awk '{print $1}'; true ; } > /tmp/sdir/SERVER_GLACIER_NICKEL
+            echo "handoff: $(du -b /tmp/sdir/SERVER_GLACIER_NICKEL | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'SERVER_GLACIER_NICKEL'
+  reAddressCanvas:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Tame the growth medium
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; expand -t 5 /etc/hosts | head -n5; true ; } > /tmp/sdir/sha_03e4a7746e53df83
+            echo "handoff: $(du -b /tmp/sdir/sha_03e4a7746e53df83 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'sha_03e4a7746e53df83'
+  iQYiHDQ:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Meanwhile prune the leases
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; for u in $(cut -d: -f1 /etc/passwd | head -n 6); do echo "user: $u"; done; true ; } > /tmp/sdir/cfgbinio
+            echo "handoff: $(du -b /tmp/sdir/cfgbinio | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'cfgbinio'
+  init6:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Total the depreciation schedule by entity
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; sed 's/=.*//' /etc/os-release | sort | uniq -c | sort --numeric-sort --reverse | fold -w 38; true ; } > /tmp/sdir/PANO-51831
+            echo "handoff: $(du -b /tmp/sdir/PANO-51831 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'PANO-51831'
+  NamedFakeArticleElement:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Suspend tagging
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; cp /etc/hosts "/tmp/w0.log" && sed -i '1d' "/tmp/w0.log" && diff /etc/hosts "/tmp/w0.log" | head -n 4; true ; } > /tmp/sdir/M
+            echo "handoff: $(du -b /tmp/sdir/M | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'M'
+  struct_Stream-convert:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Smite the secrets
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; cat /etc/os-release | grep -E -o '^(NAME|VERSION_ID)' | sort | uniq -c; true ; } > /tmp/sdir/obj-45
+            echo "handoff: $(du -b /tmp/sdir/obj-45 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'obj-45'
+  module_packet:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Final edge router cooldown
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; find /etc -maxdepth 1 -type f 2> /dev/null | grep 'rc$' | head -12; true ; } > /tmp/sdir/layerGammaBrambleMolten
+            echo "handoff: $(du -b /tmp/sdir/layerGammaBrambleMolten | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'layerGammaBrambleMolten'
+  commit_loop:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Chen to audit the key ring
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; find /dev -maxdepth 1 -type f ! -name 'pts' -exec wc -l {} +|tail -n 1; true ; } > /tmp/sdir/769cf765-26b4-3b5b
+            echo "handoff: $(du -b /tmp/sdir/769cf765-26b4-3b5b | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - '769cf765-26b4-3b5b'
+  inc_sz:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Copy the indexes out of east
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; printf '%d\n' 161 59 82 251 | sort -n | awk '{s+=$1} END {print s}'; true ; } > /tmp/sdir/c4af4359
+            echo "handoff: $(du -b /tmp/sdir/c4af4359 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'c4af4359'
+  da:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: dbg q 69
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; ls --inode /etc/*release* /etc/default |sort; true ; } > /tmp/sdir/Config.9088.59-flame
+            echo "handoff: $(du -b /tmp/sdir/Config.9088.59-flame | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'Config.9088.59-flame'
+  aud_convert_disconnect:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Prioritize renewal
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; printf '%s\n' morning lizard shared main attic > /tmp/entrygreen.out && sort /tmp/entrygreen.out; true ; } > /tmp/sdir/LXHhcEyswmryI7
+            echo "handoff: $(du -b /tmp/sdir/LXHhcEyswmryI7 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'LXHhcEyswmryI7'
+  enum__:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Mock Perf Baseline And Stress Test The Coverage Report
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; if grep -q 'hosts' /etc/nsswitch.conf; then echo found; else echo 'not found'; fi; true ; } > /tmp/sdir/GzVxY9A5zvT
+            echo "handoff: $(du -b /tmp/sdir/GzVxY9A5zvT | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'GzVxY9A5zvT'
+  mutex_in_px:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Smoke Test Triage WEB 6117
+          command: |
+            mkdir -p /tmp/sdir
+            set +o pipefail 2>/dev/null; exec {fd}> /tmp/sdir/8e1c276b7492087f58880d56cec79; seq 1 10000 >&${fd}; exec {fd}>&-; true
+            echo "handoff: $(du -b /tmp/sdir/8e1c276b7492087f58880d56cec79 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - '8e1c276b7492087f58880d56cec79'
+  Zyp23dNJ:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: sweep reward model
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; for p in blue orange pink; do printf '%s\n' "${p}"; done | head --lines=3; true ; } > /tmp/sdir/PO_039872
+            echo "handoff: $(du -b /tmp/sdir/PO_039872 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'PO_039872'
+  r4:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: UX 833 Shelve Express Lane
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; sed 's/=.*//' /etc/os-release | paste -s -d ' '; true ; } > /tmp/sdir/n015e.ridg3.spark.r4573r.fr4me
+            echo "handoff: $(du -b /tmp/sdir/n015e.ridg3.spark.r4573r.fr4me | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'n015e.ridg3.spark.r4573r.fr4me'
+  waffle_v0:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Receiving seq 4
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; find /usr/local -maxdepth 1 -type f ! -name '*' -nouser | head -2; true ; } > /tmp/sdir/CASE-55148-EB
+            echo "handoff: $(du -b /tmp/sdir/CASE-55148-EB | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'CASE-55148-EB'
+  xrayQuiver:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: CD 383 Versioning
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; if [ -f ~/.bashrc ] ; then echo true; elif [ -e /tmp ] ; then echo maybe; else echo 'false'; fi; true ; } > /tmp/sdir/v6.2.12
+            echo "handoff: $(du -b /tmp/sdir/v6.2.12 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'v6.2.12'
+  Coppers:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: hsh svgs 12
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; touch /tmp/s2.conf && mv -v /tmp/s2.conf "/tmp/bat_2023-12-17.old"; true ; } > /tmp/sdir/v.2.10
+            echo "handoff: $(du -b /tmp/sdir/v.2.10 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'v.2.10'
+  ghjkl:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Part 17 archive the training records
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; printf 'name,city,score\nhugo,austin,40\njudy,quito,100\nann,osaka,92\nzoe,hanoi,81\n' | sed 1d | sort -t, -k2; true ; } > /tmp/sdir/JWT-CSV
+            echo "handoff: $(du -b /tmp/sdir/JWT-CSV | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'JWT-CSV'
+  compressField:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Game plan audit
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; ps -eo rss= | awk '$1 % 2 == 0' | sort -n | uniq; true ; } > /tmp/sdir/dGcyzMJl
+            echo "handoff: $(du -b /tmp/sdir/dGcyzMJl | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'dGcyzMJl'
+  TotalReader:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Check the hamburger menu is enabled
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; env | head -n 10 | awk -F= '{print $1}' | sort | uniq -c | tr -d '[:digit:]'; true ; } > /tmp/sdir/nriyw
+            echo "handoff: $(du -b /tmp/sdir/nriyw | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'nriyw'
+  guard_kiln_begin_font_yogurt:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: All systems go nudge the press list
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; echo 'on it' | tee /var/tmp/weather.dat "/var/tmp/tmp_soda.copy" >/dev/null && cat "/var/tmp/tmp_soda.copy"; true ; } > /tmp/sdir/l8CGJtz3X1givfiYtZgH
+            echo "handoff: $(du -b /tmp/sdir/l8CGJtz3X1givfiYtZgH | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'l8CGJtz3X1givfiYtZgH'
+  internal_publish:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Alert the front desk once cleanup is done
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; ls -g -i -S | tail -n +2 | head -n 4; true ; } > /tmp/sdir/REF75984
+            echo "handoff: $(du -b /tmp/sdir/REF75984 | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - 'REF75984'
+  v14-25-50:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/sdir
+      - run:
+          name: Repair the archive tables out of band
+          command: |
+            mkdir -p /tmp/sdir
+            { set +o pipefail 2>/dev/null; mkdir -p "/tmp/media_logo" && cd "/tmp/media_logo" && touch athens nairobi quito && ls && cd - >/dev/null; true ; } > /tmp/sdir/6071da0b-92cd
+            echo "handoff: $(du -b /tmp/sdir/6071da0b-92cd | awk '{print $1}') B"
+      - persist_to_workspace:
+          root: /tmp/sdir
+          paths:
+            - '6071da0b-92cd'
+workflows:
+  run:
+    jobs:
+      - fOpen
+      - sys_offset_brush:
+          requires:
+            - fOpen
+      - zulu-1:
+          requires:
+            - sys_offset_brush
+      - westlog79:
+          requires:
+            - sys_offset_brush
+      - DEBUG__BODY_RIGHT:
+          requires:
+            - westlog79
+      - depoly:
+          requires:
+            - DEBUG__BODY_RIGHT
+      - delta_n1:
+          requires:
+            - DEBUG__BODY_RIGHT
+      - render-argEncode:
+          requires:
+            - delta_n1
+      - produce-full-test-matrix:
+          requires:
+            - render-argEncode
+      - z6:
+          requires:
+            - render-argEncode
+      - MittenMitten:
+          requires:
+            - z6
+      - bake-it:
+          requires:
+            - MittenMitten
+      - ddj:
+          requires:
+            - MittenMitten
+      - matchAccountShipment:
+          requires:
+            - ddj
+      - sirius-final:
+          requires:
+            - matchAccountShipment
+      - ming007:
+          requires:
+            - matchAccountShipment
+      - LANG_MY:
+          requires:
+            - ming007
+      - india:
+          requires:
+            - LANG_MY
+      - wbAccount:
+          requires:
+            - LANG_MY
+      - sha-b9c20a1dd:
+          requires:
+            - wbAccount
+      - india-5:
+          requires:
+            - sha-b9c20a1dd
+      - track_comment_fails:
+          requires:
+            - sha-b9c20a1dd
+      - reAddressCanvas:
+          requires:
+            - track_comment_fails
+      - artifacts:
+          requires:
+            - reAddressCanvas
+      - seed-length:
+          requires:
+            - reAddressCanvas
+      - iQYiHDQ:
+          requires:
+            - seed-length
+      - brodcast:
+          requires:
+            - iQYiHDQ
+      - Copy-TextId:
+          requires:
+            - iQYiHDQ
+      - init6:
+          requires:
+            - Copy-TextId
+      - v4-alpha:
+          requires:
+            - init6
+      - tryPush:
+          requires:
+            - init6
+      - NamedFakeArticleElement:
+          requires:
+            - tryPush
+      - canary-v6:
+          requires:
+            - NamedFakeArticleElement
+      - dylan-bot:
+          requires:
+            - NamedFakeArticleElement
+      - struct_Stream-convert:
+          requires:
+            - dylan-bot
+      - refactor-5299:
+          requires:
+            - struct_Stream-convert
+      - teardown_cont:
+          requires:
+            - struct_Stream-convert
+      - module_packet:
+          requires:
+            - teardown_cont
+      - ga-v3:
+          requires:
+            - module_packet
+      - columnMbMax:
+          requires:
+            - module_packet
+      - commit_loop:
+          requires:
+            - columnMbMax
+      - add-dashboard-redirect:
+          requires:
+            - commit_loop
+      - TME-OWED-C:
+          requires:
+            - commit_loop
+      - inc_sz:
+          requires:
+            - TME-OWED-C
+      - STG_STAGE_6:
+          requires:
+            - inc_sz
+      - registry_nightly_s390x:
+          requires:
+            - inc_sz
+      - da:
+          requires:
+            - registry_nightly_s390x
+      - p-01:
+          requires:
+            - da
+      - NEW_A:
+          requires:
+            - da
+      - aud_convert_disconnect:
+          requires:
+            - NEW_A
+      - nova-rev:
+          requires:
+            - aud_convert_disconnect
+      - yara_sunset:
+          requires:
+            - aud_convert_disconnect
+      - enum__:
+          requires:
+            - yara_sunset
+      - sierra:
+          requires:
+            - enum__
+      - pBuff
+      - mutex_in_px:
+          requires:
+            - pBuff
+      - fix-dashboard:
+          requires:
+            - mutex_in_px
+      - soupZulu:
+          requires:
+            - mutex_in_px
+      - Zyp23dNJ:
+          requires:
+            - soupZulu
+      - apr28-rev:
+          requires:
+            - Zyp23dNJ
+      - HQgBlkPxxJ6:
+          requires:
+            - Zyp23dNJ
+      - r4:
+          requires:
+            - HQgBlkPxxJ6
+      - b-3:
+          requires:
+            - r4
+      - adamsRank:
+          requires:
+            - r4
+      - waffle_v0:
+          requires:
+            - adamsRank
+      - full-send:
+          requires:
+            - waffle_v0
+      - TabMeta:
+          requires:
+            - waffle_v0
+      - xrayQuiver:
+          requires:
+            - TabMeta
+      - fix-metrics-crash:
+          requires:
+            - xrayQuiver
+      - storePct:
+          requires:
+            - xrayQuiver
+      - Coppers:
+          requires:
+            - storePct
+      - fx-2:
+          requires:
+            - Coppers
+      - convertPriceMVP:
+          requires:
+            - Coppers
+      - ghjkl:
+          requires:
+            - convertPriceMVP
+      - rm-oauth:
+          requires:
+            - ghjkl
+      - ms321:
+          requires:
+            - ghjkl
+      - compressField:
+          requires:
+            - ms321
+      - cook-it:
+          requires:
+            - compressField
+      - page_attrs_salt:
+          requires:
+            - compressField
+      - TotalReader:
+          requires:
+            - page_attrs_salt
+      - wen-test:
+          requires:
+            - TotalReader
+      - sys_ReceiveWake:
+          requires:
+            - TotalReader
+      - guard_kiln_begin_font_yogurt:
+          requires:
+            - sys_ReceiveWake
+      - oscar-1:
+          requires:
+            - guard_kiln_begin_font_yogurt
+      - aki2k:
+          requires:
+            - guard_kiln_begin_font_yogurt
+      - internal_publish:
+          requires:
+            - aki2k
+      - alpha-8:
+          requires:
+            - internal_publish
+      - ro_Hant_CL:
+          requires:
+            - internal_publish
+      - v14-25-50:
+          requires:
+            - ro_Hant_CL
+      - raj-verify:
+          requires:
+            - v14-25-50
